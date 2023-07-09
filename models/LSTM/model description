@@ -1,0 +1,8 @@
+Attention_LSTM_c : memory cell to decoder with attention
+Attention_LSTM_h : output of last cell to decoder with attention
+
+LSTM: memory cell to decoder
+LSTM2: output state to decoder
+LSTM3: output of every frame to decoder
+
+
