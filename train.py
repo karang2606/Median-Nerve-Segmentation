@@ -30,7 +30,7 @@ def get_args_parser():
                         help='gradient clipping max norm')
 
     # Model parameters
-    parser.add_argument('--pretrained_weights', type=str, default="r101_pretrained.pth",
+    parser.add_argument('--pretrained_weights', type=str, default="pretrained/384_coco_r101.pth",
                         help="Path to the pretrained model.")
     # * Backbone
     parser.add_argument('--backbone', default='resnet101', type=str,
