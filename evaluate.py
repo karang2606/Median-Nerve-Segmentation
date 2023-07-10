@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import argparse
 import glob
 from dataset import *
@@ -14,9 +8,7 @@ from utils.perturbation import *
 import torchvision.transforms as T
 from tqdm import tqdm
 from testing_module.eval_models import eval_UNet, eval_LSTM, eval_Siam, eval_VisTR
-
-# In[2]:
-
+from pathlib import Path
 
 def get_args_parser():
     
@@ -28,6 +20,8 @@ def get_args_parser():
     parser.add_argument('--epochs', default=150, type=int)
     parser.add_argument('--perturb_input', default=None, type=float)
     parser.add_argument('--perturb_model', default=None, type=float)
+    parser.add_argument('--no_GT', action='store_false',
+                        help="Ground Truth not available")
 
     # Model parameters
     parser.add_argument('--model_name', type=str, default = 'unet',
@@ -64,7 +58,7 @@ def get_args_parser():
     parser.add_argument('--pre_norm', action='store_true')
 
     # * Segmentation
-    parser.add_argument('--masks', action='store_true',
+    parser.add_argument('--masks', action='store_false',
                         help="Train segmentation head if the flag is provided")
 
     # Loss
@@ -129,8 +123,6 @@ def get_args_parser():
     return parser
 
 
-# In[3]:
-
 
 def main():
 
@@ -138,17 +130,8 @@ def main():
                                  parents=[get_args_parser()])
     args = parser.parse_args()
 
-    args.test_file_dir = sorted(glob.glob(args.data_path+'*'))
-
-    args.test_img_path = []
-    args.test_msk_path = []
-
-    for path in args.test_file_dir:
-        args.test_img_path.append(sorted(glob.glob(path+'/images/*.jpg'), key=key_func))
-        args.test_msk_path.append(sorted(glob.glob(path+'/masks/*.png'), key=key_func))
-
     transform_list = [T.ToTensor(),
-                      T.Normalize([0.2316], [0.2038]),
+#                       T.Normalize([0.2316], [0.2038]),
                      ]
 
     if args.perturb_input:
@@ -173,45 +156,54 @@ def main():
         model.eval()
     #     model = add_flops_counting_methods(model)
 
+        args.test_file_dir = sorted(glob.glob(args.data_path+'*'))
         avg_score = 0
-        for num in tqdm(range(len(args.test_file_dir))):
+        
+        for path in args.test_file_dir:
 
-            args.sub_name = args.test_file_dir[num].split('/')[-1]
+            args.sub_name = path.split('/')[-1]
+            args.sub_frames = sorted(glob.glob(path+'/images/*.jpg'), key=key_func)
+            args.clip_len = 40 if args.wrist else len(args.sub_frames)
 
-            args.clip_len = 40 if args.wrist else len(args.test_img_path[num])
-
-            frames = torch.stack([transform(Image.open(args.test_img_path[num][i])) for i in range(args.clip_len)])
-            true_masks = torch.stack([T.ToTensor()(Image.open(args.test_msk_path[num][i])) for i in range(args.clip_len)])
+            frames = torch.stack([transform(Image.open(frame)) for frame in args.sub_frames])
 
             args.pred_masks_seq = []
             args.score = 0
 
             if args.model_name == 'siam_unet':
-                eval_Siam(args, model, num, frames, true_masks)
+                args.sub_masks = sorted(glob.glob(path+'/masks/*.png'), key=key_func)
+                
+                eval_Siam(args, model, frames)
 
 
             elif args.model_name == 'lstm_unet':
-                eval_LSTM(args, model, frames, true_masks)
+                eval_LSTM(args, model, frames)
 
             elif  args.model_name == 'vistr':
-                eval_VisTR(args, model, num, frames, true_masks)
+                eval_VisTR(args, model, frames)
 
             else:
-                eval_UNet(args, model, frames, true_masks)
+                eval_UNet(args, model, frames)
+
+            if args.no_GT:
+                args.sub_masks = sorted(glob.glob(path+'/masks/*.png'), key=key_func)
+
+                true_masks = [np.array(Image.open(msk))/255 for msk in args.sub_masks]
+
+                args.score = np.round(get_metric(args.pred_masks_seq, true_masks), 3)
+                avg_score += args.score
+                print(f'\n{args.sub_name}, Recall: {args.score[0]}, Precision: {args.score[1]}, F1_Score: {args.score[2]}, Dice_Scor: {args.score[3]}')
+
+            if args.save_clip or not args.no_GT:
+                Path('./segmented_clips/').mkdir(parents=True, exist_ok=True)
+                create_clip(args)
+                print(f"{args.sub_name} Clip Saved!\n")
 
 
-        args.score = np.round(args.score/args.clip_len, 3)
-        avg_score += args.score
-        print(args.sub_name, f', Recall: {args.score[0]}, Precision: {args.score[1]}, F1_Score: {args.score[2]}, Dice_Scor: {args.score[3]}')
-
-        if args.save_clip:
-            create_clip(args, num)
-            print("Clip Saved!")
-
-
-    avg_score = np.round(avg_score/len(args.test_file_dir), 3)
-    print("\nAverage Metric")
-    print(f'Recall: {avg_score[0]}, Precision: {avg_score[1]}, F1_Score: {avg_score[2]}, Dice_Scor: {avg_score[3]}')
+    if args.no_GT:
+        avg_score = np.round(avg_score/len(args.test_file_dir), 3)
+        print("\nAverage Metric")
+        print(f'Recall: {avg_score[0]}, Precision: {avg_score[1]}, F1_Score: {avg_score[2]}, Dice_Scor: {avg_score[3]}')
 
 if __name__ == '__main__':
     main()
