@@ -73,7 +73,7 @@ Details of some training arguments: <br/>
 <br/>
 To train the model, run the following:
 ```
-python train_script.py --model_name unet --batch_size 16 --val_batch_size 16 --no_aug
+python train.py --model_name unet --batch_size 16 --val_batch_size 16 --no_aug
 ```
 
 ---
