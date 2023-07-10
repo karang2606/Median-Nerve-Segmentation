@@ -49,6 +49,6 @@ Training the model requires at least 30GB of GPU memory, so we have utilized two
 
 Details of some training arguments: <br />
 --model_name: Provide model name from any of these. (unet, unetpp, attn_unet, siam_unet, lstm_unet, trans_unet, vistr)
-
+&nbsp U-Net: unet
 
 
