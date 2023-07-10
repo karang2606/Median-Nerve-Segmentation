@@ -48,7 +48,13 @@ on COCO and save it to the pretrained path.
 Training the model requires at least 30GB of GPU memory, so we have utilized two NVIDIA RTX A6000 GPU cards with a memory of 48GB each.
 
 Details of some training arguments: <br />
---model_name: Provide model name from any of these. (unet, unetpp, attn_unet, siam_unet, lstm_unet, trans_unet, vistr)
-&nbsp U-Net: unet
+--model_name: Provide model name from any of these.
+> [UNet](https://arxiv.org/abs/1505.04597): unet
+> [UNet++](https://arxiv.org/abs/1807.10165): unetpp
+> [Attention UNet](https://arxiv.org/abs/1804.03999): attn_unet
+> [Siamese UNet](https://www.sciencedirect.com/science/article/pii/S1361841519301677): siam_unet
+> [LSTM UNet](https://github.com/Michael-MuChienHsu/R_Unet): lstm_unet
+> [TransUNet](https://arxiv.org/abs/2102.04306): trans_unet
+> [Video Instance Segmentation with Transformers](https://arxiv.org/abs/2011.14503): vistr
 
 
