@@ -25,6 +25,7 @@ Compile DCN module(requires GCC>=5.3, cuda>=10.0)
 cd models/dcn
 python setup.py build_ext --inplace
 ```
+
 ---
 ## Preparation
 Set directory structure as follows:
@@ -43,6 +44,7 @@ VisTR
 
 Download the pretrained DETR models [Google Drive](https://drive.google.com/drive/folders/1DlN8uWHT2WaKruarGW2_XChhpZeI9MFG)
 on COCO and save it to the pretrained path.
+
 ---
 ## Training
 Training the model requires at least 30GB of GPU memory, so we have utilized two NVIDIA RTX A6000 GPU cards with a memory of 48GB each.
@@ -109,4 +111,3 @@ We would like to thank the DETR and VisTR open-source projects for their awesome
 [^6]: Chen, Jieneng, et al. "Transunet: Transformers make strong encoders for medical image segmentation." arXiv preprint arXiv:2102.04306 (2021).
 
 [^7]: Wang, Yuqing, et al. "End-to-end video instance segmentation with transformers." Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2021.
-
