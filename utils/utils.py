@@ -1,14 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[5]:
-
 import glob
 import re
 import logging
 from tqdm import tqdm
-# from tqdm.notebook import tqdm
-
 import numpy as np
 from PIL import Image
 import os
@@ -25,7 +18,6 @@ from torchvision.ops import masks_to_boxes
 import time
 from mmcv.cnn.utils.flops_counter import add_flops_counting_methods, flops_to_string, params_to_string
 from models.VisTR.datasets import transforms as DT
-# In[1]:
 
 pat=re.compile("(\d+)\D*$")
 
@@ -189,22 +181,25 @@ def get_frames(path):
             break
     return frame_list
 
-def create_clip(args, num):
+def create_clip(args):
     
-    clip = args.test_img_path[num]
+    clip = args.sub_frames
 
     frameSize = Image.open(clip[0]).size # width x height
     args.frameRate = 5
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(f'{args.sub_name}_{args.model_name}.avi', fourcc, args.frameRate, frameSize)
+    out = cv2.VideoWriter(f'./segmented_clips/{args.sub_name}_{args.model_name}.avi', fourcc, args.frameRate, frameSize)
 
-    for i in tqdm(range(args.clip_len)):
+    for i in range(args.clip_len):
 
         img = Image.open(clip[i]) #frame
 
-        msk = Image.open(args.test_msk_path[num][i]) #ground Truth
-        temp = DrawContours(img, msk, 'GT') #Green
-        out_frame = DrawContours(temp,args.pred_masks_seq[i], 'Pred') #Red
+        if args.no_GT:
+            msk = np.array(Image.open(args.sub_masks[i])) #ground Truth
+            img = DrawContours(img, msk, 'GT') #Green
+        
+        if len(np.unique(args.pred_masks_seq[i])) == 2:
+            out_frame = DrawContours(img, args.pred_masks_seq[i], 'Pred') #Red
     #     out_frame = out_frame[:224]
 
         #  area mm2/ a pixel
@@ -228,14 +223,3 @@ def load_model(model, args):
     model.load_state_dict(state_dict)
     print(f'Model loaded from {args.load_from}')
     return model
-
-# def load_model(model, args):
-#     if args.load_from:
-#         state_dict = torch.load(args.load_from, map_location='cpu')
-
-#     else:
-#         args.load_from = sorted(glob.glob(args.output_dir + '/*.pth'), key=key_func)[-1]
-#         state_dict = torch.load(args.load_from, map_location='cpu')
-#     model.load_state_dict(state_dict)
-#     print(f'Model loaded from {args.load_from}')
-#     return model
