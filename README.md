@@ -48,9 +48,9 @@ on COCO and save it to the pretrained path.
 Training the model requires at least 30GB of GPU memory, so we have utilized two NVIDIA RTX A6000 GPU cards with a memory of 48GB each.
 
 Details of some training arguments: <br/>
-```
---model_name: Provide model name from any of these.
-```
+
+`--model_name`: Provide model name from any of these.
+
 | Model name        | Argument |
 | :------------- |:-------------:|
 | [UNet](https://arxiv.org/abs/1505.04597)      | unet |
@@ -61,12 +61,12 @@ Details of some training arguments: <br/>
 | [TransUNet](https://arxiv.org/abs/2102.04306) | trans_unet |
 | [Video Instance Segmentation with Transformers](https://arxiv.org/abs/2011.14503)| vistr |
 
-```
---no_aug: If true, we augment the data by doing horizontal and vertical flips. <br/>
---data_path: Provide path for training data. The default is "data/train/" <br/>
---lr: Learning rate <br/>
---epochs: Number of epochs for training. <br/>
---pretrained_weights: Path to pretrained weights for VisTR backbone. The default is "pretrained/384_coco_r101.pth" <br/>
-```
+
+`--no_aug` If true, we augment the data by doing horizontal and vertical flips. <br/>
+`--data_path` Provide path for training data. The default is "data/train/" <br/>
+`--lr` Learning rate <br/>
+`--epochs` Number of epochs for training. <br/>
+`--pretrained_weights` Path to pretrained weights for VisTR backbone. The default is "pretrained/384_coco_r101.pth" <br/>
+
 Details of some test arguments: <br/>
 
