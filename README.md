@@ -77,7 +77,7 @@ python train.py --model_name unet --batch_size 16 --val_batch_size 16 --no_aug
 ```
 
 ---
-## Evaluation
+## Testing
 Details of some test arguments: <br/>
 `--data_path`: Provide a path for testing data. The default is "data/test/" <br/>
 `--load_from`: Path to pretrained model weights.
@@ -85,10 +85,11 @@ Details of some test arguments: <br/>
 the nerve at the bottom.
 `--perturb_input`: Perturbe the input frame with Poisson noise.
 `--perturb_model`: Perturbe the model with a given fraction.
+`--no_GT`: Testing for video without having ground truth.
 
 To test the model, run the following:
 ```
-python evaluate.py --model_name vistr --perturb_input 0.05 --perturb_model 0.1
+python test.py --model_name vistr --perturb_input 0.05 --perturb_model 0.1
 ```
 
 ---
