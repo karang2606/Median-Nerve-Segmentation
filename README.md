@@ -67,3 +67,6 @@ Details of some training arguments: <br />
 > [LSTM UNet](https://github.com/Michael-MuChienHsu/R_Unet): lstm_unet <br/> 
 > [TransUNet](https://arxiv.org/abs/2102.04306): trans_unet <br/>
 > [Video Instance Segmentation with Transformers](https://arxiv.org/abs/2011.14503): vistr <br/>
+
+
+[//]: # (this wont be included)
