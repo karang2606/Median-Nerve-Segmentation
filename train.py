@@ -60,7 +60,7 @@ def get_args_parser():
     parser.add_argument('--pre_norm', action='store_true')
 
     # * Segmentation
-    parser.add_argument('--masks', action='store_true',
+    parser.add_argument('--masks', action='store_false',
                         help="Train segmentation head if the flag is provided")
 
     # Loss
