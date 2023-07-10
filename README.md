@@ -58,3 +58,8 @@ Details of some training arguments: <br />
 > [Video Instance Segmentation with Transformers](https://arxiv.org/abs/2011.14503): vistr <br/>
 
 
+| Model name        | Argument |
+| :------------- |:-------------:|
+| [UNet](https://arxiv.org/abs/1505.04597)      | unet |
+| [UNet++](https://arxiv.org/abs/1807.10165)      | unetpp      |
+| [Attention UNet](https://arxiv.org/abs/1804.03999) | attn_unet      |
