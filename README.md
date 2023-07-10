@@ -7,7 +7,7 @@ Clone the git-repository first.
 git clone https://github.com/karang2606/Median-Nerve-Segmentation.git
 ```
 
-Then, install the latest version of Pytorch and Torchvision from [this link]{https://pytorch.org/get-started/locally/} or below.
+Then, install the latest version of Pytorch and Torchvision from [this link](https://pytorch.org/get-started/locally/) or below.
 ```
 conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
 ```
@@ -41,7 +41,7 @@ VisTR
 ...
 ```
 
-Download the pretrained DETR models [Google Drive]{https://drive.google.com/drive/folders/1DlN8uWHT2WaKruarGW2_XChhpZeI9MFG}
+Download the pretrained DETR models [Google Drive](https://drive.google.com/drive/folders/1DlN8uWHT2WaKruarGW2_XChhpZeI9MFG)
 on COCO and save it to the pretrained path.
 
 ## Training
