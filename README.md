@@ -22,7 +22,7 @@ location in your system, i.e., home/anaconda3/lib/python3.10/site-packages/pycoc
 
 Compile DCN module(requires GCC>=5.3, cuda>=10.0)
 ```
-cd models/dcn
+cd models/VisTR/models/dcn
 python setup.py build_ext --inplace
 ```
 
