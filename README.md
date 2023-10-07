@@ -60,7 +60,7 @@ Details of some training arguments: <br/>
 | [Attention UNet](https://arxiv.org/abs/1804.03999)[^3] | attn_unet |
 | [Siamese UNet](https://www.sciencedirect.com/science/article/pii/S1361841519301677)[^4] | siam_unet |
 | [LSTM UNet](https://ieeexplore.ieee.org/abstract/document/8981027)[^5] | lstm_unet |
-[comment]: <> (https://github.com/Michael-MuChienHsu/R_Unet)
+<!-- https://github.com/Michael-MuChienHsu/R_Unet -->
 
 | [TransUNet](https://arxiv.org/abs/2102.04306)[^6] | trans_unet |
 | [Video Instance Segmentation with Transformers](https://arxiv.org/abs/2011.14503)[^7] | vistr |
