@@ -1,6 +1,6 @@
 import torch
 from torch import Tensor
-
+import torch.nn as nn
 
 def dice_coeff(input: Tensor, target: Tensor, reduce_batch_first: bool = False, epsilon: float = 1e-6):
     # Average of Dice coefficient for all batches, or for a single mask
@@ -26,3 +26,44 @@ def dice_loss(input: Tensor, target: Tensor, multiclass: bool = False):
     # Dice loss (objective to minimize) between 0 and 1
     fn = multiclass_dice_coeff if multiclass else dice_coeff
     return 1 - fn(input, target, reduce_batch_first=True)
+
+#PyTorch
+class DiceLoss(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(DiceLoss, self).__init__()
+
+    def forward(self, inputs, targets, smooth=1e-5):
+        
+        #comment out if your model contains a sigmoid or equivalent activation layer
+#         inputs = F.sigmoid(inputs)       
+        
+        # targets = (targets > 0.5).float()
+
+        #flatten label and prediction tensors
+        inputs = inputs.view(-1)
+        targets = targets.view(-1)
+        
+        intersection = (inputs * targets).sum()                            
+        dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
+        
+        return 1 - dice
+
+    
+class LogCoshDiceLoss(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(LogCoshDiceLoss, self).__init__()
+
+    def forward(self, inputs, targets, smooth=1e-5):
+        
+        # comment out if your model contains a sigmoid or equivalent activation layer
+        # inputs = F.sigmoid(inputs)       
+        # targets = (targets > 0.5).float()
+        
+        #flatten label and prediction tensors
+        inputs = inputs.view(-1)
+        targets = targets.view(-1)
+        
+        intersection = (inputs * targets).sum()                            
+        dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
+        
+        return torch.log(torch.cosh(1-dice))

@@ -1,0 +1,4 @@
+# ninja log v5
+1	16932	1704951636	/home/karan-mig/Downloads/VisTR paper code/models/VisTR/models/dcn/build/temp.linux-x86_64-cpython-311/deformable/deform_conv.o	e2aa5c0a55c5f9cc
+0	17754	1704951637	/home/karan-mig/Downloads/VisTR paper code/models/VisTR/models/dcn/build/temp.linux-x86_64-cpython-311/deformable/deform_conv_cuda_kernel.o	36a6e9bc0f374e15
+1	20314	1704951639	/home/karan-mig/Downloads/VisTR paper code/models/VisTR/models/dcn/build/temp.linux-x86_64-cpython-311/deformable/deform_conv_cuda.o	c78dcdafaf0af918

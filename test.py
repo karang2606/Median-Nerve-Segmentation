@@ -97,6 +97,8 @@ def get_args_parser():
                         help="If true, model will train for only first 40 frames. i.e. wrist area")
     parser.add_argument('--save_clip', action='store_true',
                         help="If true, model will save the clip with prediction contours.")
+    parser.add_argument('--filter', action='store_true',
+                        help="If true, model will filter the clip of prediction contours.")
     parser.add_argument('--data_path', default='data/test/')
     parser.add_argument('--save_path', default='results.json')
     parser.add_argument('--dataset_file', default='ytvos')
@@ -112,7 +114,6 @@ def get_args_parser():
     parser.add_argument('--resume', default='', help='resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
-    #parser.add_argument('--eval', action='store_true')
     parser.add_argument('--eval', action='store_false')
     parser.add_argument('--num_workers', default=0, type=int)
 
@@ -131,7 +132,7 @@ def main():
     args = parser.parse_args()
 
     transform_list = [T.ToTensor(),
-#                       T.Normalize([0.2316], [0.2038]),
+                      T.Normalize([0.2316], [0.2038]),
                      ]
 
     if args.perturb_input:
@@ -156,25 +157,32 @@ def main():
         model.eval()
     #     model = add_flops_counting_methods(model)
 
+        #  area mm2/ a pixel
+        const = (30/448)**2
+        
         args.test_file_dir = sorted(glob.glob(args.data_path+'*'))
         avg_score = 0
+        avg_cs = 0
+        GT_avg_cs = 0
+        
+        avg_fps = []
         
         for path in args.test_file_dir:
 
             args.sub_name = path.split('/')[-1]
             args.sub_frames = sorted(glob.glob(path+'/images/*.jpg'), key=key_func)
             args.clip_len = 40 if args.wrist else len(args.sub_frames)
-
+            
             frames = torch.stack([transform(Image.open(frame)) for frame in args.sub_frames])
 
-            args.pred_masks_seq = []
             args.score = 0
-
+            args.pred_masks_seq = []
+            
             if args.model_name == 'siam_unet':
                 args.sub_masks = sorted(glob.glob(path+'/masks/*.png'), key=key_func)
-                
                 eval_Siam(args, model, frames)
-
+                args.sub_frames = args.sub_frames[1:]
+                args.clip_len -=1
 
             elif args.model_name == 'lstm_unet':
                 eval_LSTM(args, model, frames)
@@ -185,6 +193,14 @@ def main():
             else:
                 eval_UNet(args, model, frames)
 
+            avg_fps.append(args.fps)
+
+            area = np.sum(np.array(args.pred_masks_seq), axis=(1,2))*const
+            mean_cs = np.mean(area)
+            avg_cs += mean_cs
+
+            if args.filter: args.pred_masks_seq = get_filtered_mask(args.pred_masks_seq)
+                
             if args.no_GT:
                 args.sub_masks = sorted(glob.glob(path+'/masks/*.png'), key=key_func)
 
@@ -192,18 +208,24 @@ def main():
 
                 args.score = np.round(get_metric(args.pred_masks_seq, true_masks), 3)
                 avg_score += args.score
-                print(f'\n{args.sub_name}, Recall: {args.score[0]}, Precision: {args.score[1]}, F1_Score: {args.score[2]}, Dice_Scor: {args.score[3]}')
+
+                GT_area = np.sum(np.array(true_masks), axis=(1,2))*const
+                GT_mean_cs = np.mean(GT_area)
+                GT_avg_cs += GT_mean_cs
+                print(f'\n{args.sub_name}, Recall: {args.score[0]}, Precision: {args.score[1]}, F1_Score: {args.score[2]}, Dice_Score: {args.score[3]}, Hausdorff Distance: {args.score[4]}, GT C/S: {round(GT_mean_cs,3)} mm\u00b2, C/S: {round(mean_cs,3)} mm\u00b2')
 
             if args.save_clip or not args.no_GT:
                 Path('./segmented_clips/').mkdir(parents=True, exist_ok=True)
                 create_clip(args)
                 print(f"{args.sub_name} Clip Saved!\n")
 
-
+    print('Frames per second', round(np.mean(avg_fps), 3))
     if args.no_GT:
         avg_score = np.round(avg_score/len(args.test_file_dir), 3)
         print("\nAverage Metric")
-        print(f'Recall: {avg_score[0]}, Precision: {avg_score[1]}, F1_Score: {avg_score[2]}, Dice_Scor: {avg_score[3]}')
-
+        print(f'Recall: {avg_score[0]}, Precision: {avg_score[1]}, F1_Score: {avg_score[2]}, Dice_Score: {avg_score[3]}, Hausdorff Distance: {avg_score[4]}, GT C/S: {round(GT_avg_cs/len(args.test_file_dir), 3)} mm\u00b2, C/S: {round(avg_cs/len(args.test_file_dir), 3)} mm\u00b2')
+        print({round(GT_avg_cs/len(args.test_file_dir), 3)})
+        print(f'{avg_score[0]} & {avg_score[1]} & {avg_score[3]} & {avg_score[4]}  & {round(avg_cs/len(args.test_file_dir), 3)}')
+            
 if __name__ == '__main__':
     main()

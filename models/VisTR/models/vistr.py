@@ -14,13 +14,13 @@ from models.VisTR.util.misc import (NestedTensor, nested_tensor_from_tensor_list
 from .backbone import build_backbone
 from .matcher import build_matcher
 from .segmentation import (VisTRsegm, PostProcessSegm,
-                           dice_loss, sigmoid_focal_loss)
+                           dice_loss, logcosh, sigmoid_focal_loss)
 from .transformer import build_transformer
 
 
 class VisTR(nn.Module):
     """ This is the VisTR module that performs video object detection """
-    def __init__(self, backbone, transformer, num_classes, num_frames, num_queries, aux_loss=False):
+    def __init__(self, args, backbone, transformer, num_classes, num_frames, num_queries, aux_loss=False):
         """ Initializes the model.
         Parameters:
             backbone: torch module of the backbone to be used. See backbone.py
@@ -41,6 +41,7 @@ class VisTR(nn.Module):
         self.query_embed = nn.Embedding(num_queries, hidden_dim)
         self.num_frames = num_frames
         self.input_proj = nn.Conv2d(backbone.num_channels, hidden_dim, kernel_size=1)
+        self.backbone_name = args.backbone
         self.backbone = backbone
         self.aux_loss = aux_loss
 
@@ -65,6 +66,7 @@ class VisTR(nn.Module):
         features, pos = self.backbone(samples)
         pos = pos[-1]
         src, mask = features[-1].decompose()
+        
         src_proj = self.input_proj(src)
         n,c,h,w = src_proj.shape
         assert mask is not None
@@ -202,6 +204,8 @@ class SetCriterion(nn.Module):
    
         if self.args.dice_loss:
             losses["loss_dice"] = dice_loss(src_masks, target_masks, num_boxes)
+            #losses["loss_logcosh"] = logcosh(src_masks, target_masks, num_boxes)
+            
         return losses
 
     def _get_src_permutation_idx(self, indices):
@@ -324,6 +328,7 @@ def build(args):
     transformer = build_transformer(args)
 
     model = VisTR(
+        args,
         backbone,
         transformer,
         num_classes=num_classes,

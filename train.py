@@ -20,6 +20,10 @@ def get_args_parser():
                         help="Path to save the weights of model.")
     parser.add_argument('--model_name', type=str, default = 'unet',
                         help="Provide Model.")
+    parser.add_argument('--save_intervals', default=5, type=int)
+    parser.add_argument('--resume', action='store_true',
+                        help="Resume the training from the last checkpoint.")
+    
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_backbone', default=1e-5, type=float)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
@@ -30,7 +34,7 @@ def get_args_parser():
                         help='gradient clipping max norm')
 
     # Model parameters
-    parser.add_argument('--pretrained_weights', type=str, default="pretrained/384_coco_r101.pth",
+    parser.add_argument('--pretrained_weights', type=str, default=None,
                         help="Path to the pretrained model.")
     # * Backbone
     parser.add_argument('--backbone', default='resnet101', type=str,
@@ -64,6 +68,7 @@ def get_args_parser():
                         help="Train segmentation head if the flag is provided")
 
     # Loss
+    parser.add_argument("--loss", nargs="+", choices=["bce", "dice", "logcosh"], required=True, help="Loss functions to use")
     parser.add_argument('--no_aux_loss', dest='aux_loss', action='store_false',
                         help="Disables auxiliary decoding losses (loss at each layer)")
     parser.add_argument('--no_labels_loss', dest='labels_loss', action='store_false',
@@ -104,7 +109,7 @@ def get_args_parser():
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=42, type=int)
-    parser.add_argument('--resume', default='', help='resume from checkpoint')
+#     parser.add_argument('--resume', default='', help='resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--eval', action='store_true')
@@ -124,11 +129,12 @@ def main():
 
     train_loader, val_loader = get_dataset(args)
 
-    if args.model_name != 'vistr':
-        train_UNet(args, train_loader, val_loader)
+    print('Model:', args.model_name)
+    if args.model_name == 'vistr' or 'vgg' in args.model_name:
+        train_VisTR(args, train_loader, val_loader)
 
     else:
-        train_VisTR(args, train_loader, val_loader)
+        train_UNet(args, train_loader, val_loader)
 
 
 if __name__ == '__main__':

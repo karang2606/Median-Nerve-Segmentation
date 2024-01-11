@@ -181,7 +181,7 @@ def get_dataset(args):
             args.n_train = len(train_dataset)
             args.n_val = len(val_dataset)
 
-    elif args.model_name == 'vistr':
+    elif args.model_name == 'vistr' or 'vgg' in args.model_name:
         
         args.batch_size = 1
         num_frames = args.num_frames
@@ -205,17 +205,16 @@ def get_dataset(args):
             args.n_test = len(test_dataset)
             
         else:
-            val_percent = args.val_percent
-            n_val = int(len(image_list) * val_percent)
-            n_train = len(image_list) - n_val
+            # val_percent = args.val_percent
+            # n_val = int(len(image_list) * val_percent)
+            # n_train = len(image_list) - n_val
 
-            train_image_list, val_image_list = random_split(image_list, [n_train, n_val], generator=torch.Generator().manual_seed(0))
-            train_mask_list, val_mask_list = random_split(mask_list, [n_train, n_val], generator=torch.Generator().manual_seed(0))
+            # train_image_list, val_image_list = random_split(image_list, [n_train, n_val], generator=torch.Generator().manual_seed(0))
+            # train_mask_list, val_mask_list = random_split(mask_list, [n_train, n_val], generator=torch.Generator().manual_seed(0))
 
-                # no validation ground truth for ytvos dataset
-
-            train_dataset = ImagePathDataset_vistr(train_image_list, train_mask_list,
-                                         num_frames, transform=make_transform(image_set='train'))
+            # no validation ground truth for ytvos dataset
+            train_dataset = ImagePathDataset_vistr(image_list, mask_list,
+                                         num_frames, transform=make_transform(image_set='train'), aug=args.no_aug)
 
             sampler_train = torch.utils.data.RandomSampler(train_dataset)
 

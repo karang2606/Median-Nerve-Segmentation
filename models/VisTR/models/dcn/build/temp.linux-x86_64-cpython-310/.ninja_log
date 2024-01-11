@@ -1,0 +1,4 @@
+# ninja log v5
+0	10000	1687405876588232616	/home/karan/Downloads/VisTR-master/models/dcn/build/temp.linux-x86_64-cpython-310/deformable/deform_conv.o	c479ba7956644d1f
+0	11265	1687405877856232609	/home/karan/Downloads/VisTR-master/models/dcn/build/temp.linux-x86_64-cpython-310/deformable/deform_conv_cuda_kernel.o	412673061e9705cb
+0	12537	1687405879128232602	/home/karan/Downloads/VisTR-master/models/dcn/build/temp.linux-x86_64-cpython-310/deformable/deform_conv_cuda.o	fb5fca453606736c
