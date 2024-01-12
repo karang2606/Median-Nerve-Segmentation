@@ -78,6 +78,7 @@ python train.py --model_name unet --batch_size 16 --val_batch_size 16 --no_aug
 
 ---
 ## Testing
+Download the trained weights of model from [here](https://drive.google.com/file/d/1jiUq5ZYHeZIa4nycoRj65LZ3lvwkvw0-/view?usp=sharing)
 Details of some test arguments: <br/>
 `--data_path`: Provide a path for testing data. The default is "data/test/" <br/>
 `--load_from`: Path to pretrained model weights.
